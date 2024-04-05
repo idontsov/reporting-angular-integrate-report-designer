@@ -39,6 +39,47 @@ function LaunchFrontend([Parameter(Mandatory)][string]$path) {
     }
 }
 
+function RunTests() {
+    Write-Host "Starting TestCafe"
+
+    $browserList = 'chrome'
+    $fileOrGlob = './smoke-test.ts'
+
+    $arguments = @(
+        'testcafe'
+        $browserList
+        $fileOrGlob
+        '--base-url http://localhost:4200'
+    )
+
+    # if($fixture) {
+    #     $arguments += "--fixture `"$fixture`""
+    # }
+    # if($test) {
+    #     $arguments += "--test `"$test`""
+    # }
+    # if($concurrency) {
+    #     $arguments += "--concurrency $concurrency"
+    # }
+    # if($debugOnFail) {
+    #     $arguments += "--debug-on-fail"
+    # }
+    # if($live) {
+    #     $arguments += "--live"
+    # }
+
+    $process = Start-Process 'npx' -ArgumentList $arguments -NoNewWindow -Wait -ErrorAction Stop -PassThru
+    $exitCode = $process.ExitCode
+
+    Write-Host "TestCafe exit code: $exitCode"
+
+    # npx testcafe --base-url http://localhost:4200 chrome .\smoke-test.ts | Out-Host
+    # $exitCode = $LastExitCode
+
+    return $exitCode
+
+}
+
 function Main() {
     InstallNpmPackages
     $backendProcess = LaunchBackend ./ServerSideAspNetCoreReportingApp/ServerSideAspNetCoreReportingApp
@@ -50,13 +91,13 @@ function Main() {
         # - what about powershell jobs?
         # - leverage knowledge on 'stream waiting' and use 'launcher tool'.
 
-        npx testcafe --base-url http://localhost:4200 chrome .\smoke-test.ts | Out-Host
-        return $LastExitCode
+        return RunTests
 
-        # Start-Sleep -Seconds 10
     } finally {
         Stop-Process $backendProcess
     }
+
+    
 }
 
 try {

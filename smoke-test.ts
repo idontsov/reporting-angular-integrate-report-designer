@@ -8,6 +8,8 @@ fixture('Smoke Tests')
     });
 
 test('Report Designer', async t => {
+    // await t.expect(false).ok('Expected failure');
+
     await assertUntilCondition(t, () => getToolbarButtonByText('preview').exists, 'Wait for designer loading');
     await t
         .dispatchEvent(getToolbarButtonByText('preview'), 'click');
@@ -16,4 +18,8 @@ test('Report Designer', async t => {
         .dispatchEvent(getToolbarButtonByText('design'), 'click')
         .click(designerMenuButton)
         .click(getMenuItemByText('Exit'));
+});
+
+test('Dummy Success', async t => {
+    console.log('Dummy Success test');
 });
