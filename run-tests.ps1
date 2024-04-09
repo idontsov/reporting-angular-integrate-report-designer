@@ -14,7 +14,7 @@ function CheckLastExitCode() {
 }
 
 function InstallNpmPackages() {
-    if(-Not(Test-Path .\node_modules)) {
+    if(-Not(Test-Path .\node_modules\*)) {
         npm ci | Out-Host
         CheckLastExitCode
     }
