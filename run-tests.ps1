@@ -33,7 +33,7 @@ function LaunchFrontend([Parameter(Mandatory)][string]$path) {
     Push-Location $path
     try {
         InstallNpmPackages
-        Start-Process npm -ArgumentList ('start') -PassThru | Out-Null
+        Start-Process cmd -ArgumentList ('/c', 'npm', 'start') -PassThru | Out-Null
     } finally {
         Pop-Location
     }
@@ -46,6 +46,8 @@ function RunTests() {
     $fileOrGlob = './smoke-test.ts'
 
     $arguments = @(
+        '/c'
+        'npx.cmd'
         'testcafe'
         $browserList
         $fileOrGlob
@@ -68,16 +70,11 @@ function RunTests() {
     #     $arguments += "--live"
     # }
 
-    $process = Start-Process 'npx' -ArgumentList $arguments -NoNewWindow -Wait -ErrorAction Stop -PassThru
+    $process = Start-Process 'cmd' -ArgumentList $arguments -NoNewWindow -Wait -ErrorAction Stop -PassThru
     $exitCode = $process.ExitCode
 
     Write-Host "TestCafe exit code: $exitCode"
-
-    # npx testcafe --base-url http://localhost:4200 chrome .\smoke-test.ts | Out-Host
-    # $exitCode = $LastExitCode
-
     return $exitCode
-
 }
 
 function Main() {
@@ -96,8 +93,6 @@ function Main() {
     } finally {
         Stop-Process $backendProcess
     }
-
-    
 }
 
 try {
