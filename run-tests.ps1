@@ -33,7 +33,7 @@ function LaunchFrontend([Parameter(Mandatory)][string]$path) {
     Push-Location $path
     try {
         InstallNpmPackages
-        Start-Process cmd -ArgumentList ('/c', 'npm', 'start') -PassThru | Out-Null
+        return Start-Process cmd -ArgumentList ('/c', 'npm', 'start') -PassThru
     } finally {
         Pop-Location
     }
@@ -81,17 +81,12 @@ function Main() {
     InstallNpmPackages
     $backendProcess = LaunchBackend ./ServerSideAspNetCoreReportingApp/ServerSideAspNetCoreReportingApp
     try {
-        LaunchFrontend ./angular-report-designer
-        # We do not store $frontendProcess, because running 'npm start' creates a sequence of processes, ending with esbuild.exe
-        # And I'm not sure if there is an easy way to track that process
-        # Options to consider:
-        # - what about powershell jobs?
-        # - leverage knowledge on 'stream waiting' and use 'launcher tool'.
-
+        $frontendProcess = LaunchFrontend ./angular-report-designer
         return RunTests
 
     } finally {
-        Stop-Process $backendProcess
+        taskkill.exe /F /T /PID $frontendProcess.Id | Out-Host # TODO: current implementation is Windows-only
+        Stop-Process $backendProcess | Out-Host
     }
 }
 
